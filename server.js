@@ -35,6 +35,16 @@ app.post('/api/prepayments', async(req, res)=>{
     }
 })
 
+app.get('/api/prepayments', async (req, res) => {
+    try {
+        // Find all prepayments and sort them by date (newest first)
+        const payments = await Prepayment.find().sort({ date: -1 });
+        res.status(200).json(payments);
+    } catch (error) {
+        res.status(500).json({ message: "Failed to fetch payments", error: error.message });
+    }
+});
+
 // Tells the server to start listening for requests
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
