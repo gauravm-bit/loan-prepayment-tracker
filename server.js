@@ -1,12 +1,15 @@
 require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
-const Prepayment = require("./models/Prepayment")
+const cors = require("cors");
+
+const Prepayment = require("./models/Prepayment");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
 // This middleware allows our app to read JSON data later on
+app.use(cors());
 app.use(express.json());
 
 mongoose
@@ -23,26 +26,30 @@ app.get("/", (req, res) => {
   res.send("Loan Prepayment Tracker Server is Live!");
 });
 
-app.post('/api/prepayments', async(req, res)=>{
-    try{
-        const newPayment = new Prepayment(req.body);
+app.post("/api/prepayments", async (req, res) => {
+  try {
+    const newPayment = new Prepayment(req.body);
 
-        const savedPayment = await newPayment.save();
+    const savedPayment = await newPayment.save();
 
-        res.status(201).json(savedPayment);
-    } catch (error){
-        res.status(400).json({message: "Failed to save payment, error:error.message"});
-    }
-})
+    res.status(201).json(savedPayment);
+  } catch (error) {
+    res
+      .status(400)
+      .json({ message: "Failed to save payment, error:error.message" });
+  }
+});
 
-app.get('/api/prepayments', async (req, res) => {
-    try {
-        // Find all prepayments and sort them by date (newest first)
-        const payments = await Prepayment.find().sort({ date: -1 });
-        res.status(200).json(payments);
-    } catch (error) {
-        res.status(500).json({ message: "Failed to fetch payments", error: error.message });
-    }
+app.get("/api/prepayments", async (req, res) => {
+  try {
+    // Find all prepayments and sort them by date (newest first)
+    const payments = await Prepayment.find().sort({ date: -1 });
+    res.status(200).json(payments);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Failed to fetch payments", error: error.message });
+  }
 });
 
 // Tells the server to start listening for requests
